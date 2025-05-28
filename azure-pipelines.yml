@@ -1,38 +1,23 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+trigger:
+  - main  # or your default branch
 
-# Starter pipeline
+pool:
+  name: Default  # or your custom self-hosted agent pool name
 
-          # Start with a minimal pipeline that you can customize to build and deploy your code.
+steps:
+  - task: UseJava@1
+    inputs:
+      versionSpec: '11'  # or 17 based on your project
+      jdkArchitecture: 'x64'
 
-          # Add steps that build, run tests, deploy, and more:
-
-          # https://aka.ms/yaml
-
- 
-
-          trigger:
-
-          - master
-
- 
-
-          pool:
-
-            name: Default
-
- 
-
-          steps:
-
-          - script: echo Myfirst Azure Pipeline for maven project
-
-            displayName: 'Run a one-line script'
-
-          - script: mvn clean install
-
-            displayName: 'Build with maven'
-
-          - script: java -jar target/MyMavenApp-1.0-SNAPSHOT.jar
+  - task: Maven@3
+    inputs:
+      mavenPomFile: 'pom.xml'
+      goals: 'clean install'
+      options: '-Xmx1024m'
+      publishJUnitResults: true
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.11'  # or 17
+      mavenVersionOption: 'Default'
+      mavenAuthenticateFeed: false
